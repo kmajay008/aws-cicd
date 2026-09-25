@@ -1,0 +1,36 @@
+version: 0.1
+
+phases:
+  pre_build:
+    commands:
+      - mvn clean install
+      - echo Logging into aws ECR...
+      - aws --version
+      - REPOSITORY_URI=147723036170.dkr.ecr.ap-south-1.amazonaws.com/avnay-registry
+      - aws ecr get-login-password --region us-east-2 | docker
+      - COMMIT_HASH=$(echo $CODEBUILD_BUILD_ID | cut -c 1-7)
+      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo building the docker img...
+      - docker build -t $REPOSITORY_URI:latest .
+      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI=$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Build complete on `date`
+      - echo Pushing the docker images..
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI=$IMAGE_TAG
+      - echo writing image definition file...
+      - DOCKER_CONTAINER_NAME=avnay-registry
+      - echo $DOCKER_CONTAINER_NAME
+
+artifacts:
+  files:
+    - imagedefinitions.json
+    - target/course-service.jar
+
+
