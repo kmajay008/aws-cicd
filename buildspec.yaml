@@ -7,7 +7,7 @@ phases:
       - echo Logging into aws ECR...
       - aws --version
       - REPOSITORY_URI=147723036170.dkr.ecr.ap-south-1.amazonaws.com/avnay-registry
-      - aws ecr get-login-password --region us-east-2 | docker
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin $REPOSITORY_URI
       - COMMIT_HASH=$(echo $CODEBUILD_BUILD_ID | cut -c 1-7)
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
 
