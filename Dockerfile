@@ -1,4 +1,4 @@
-FROM openjdk:25
+FROM openjdk:21
 WORKDIR /app
 COPY ./target/course-service.jar /app
 EXPOSE 8080
